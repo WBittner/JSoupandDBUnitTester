@@ -4,7 +4,9 @@ import java.io.IOException;
 
 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+
 
 //import JSoup bus'
 import org.jsoup.Jsoup;
@@ -40,6 +42,8 @@ public class JUNIT {
 		//set the number of countries and stats into their respective globals 
 		setGlobals();
 		
+		
+		//test the getCountryArrays method
 		try
 		{
 			int param1 = 3;
@@ -51,7 +55,7 @@ public class JUNIT {
 			System.out.println(e);
 		}
 		
-		
+		//test the getStatsArray method
 		try
 		{
 			double[] statStats = getStatArrays(111);
@@ -66,7 +70,7 @@ public class JUNIT {
 		
 	}
 
-
+	
 	//Sets numStats and numCountries into the globals from the descriptorURL
 	public static void setGlobals() throws IOException
 	{		
@@ -110,7 +114,7 @@ public class JUNIT {
 		numCountries = countriesArray.length();		
 	}
 	
-	public static JSONArray[] getCountryArrays(int countryID) throws IOException, Error
+	public static JSONArray[] getCountryArrays(int countryID) throws IOException, ThePHPPageGaveMeAnErrorException
 	{
 		Document doc = Jsoup.connect(byCountryURL + countryID).get();
 		String bodyText = doc.body().text();
@@ -131,12 +135,12 @@ public class JUNIT {
 			return jray;	
 		}
 		//elseif(country.has("error")
-		throw new IOException("Error calling getCountryArrays(" + countryID + ")\n"
+		throw new ThePHPPageGaveMeAnErrorException("Error calling getCountryArrays(" + countryID + ")\n"
 				+ "Printed Error: " + stats.getString("error"));
 	
 	}
 	
-	public static double[] getStatArrays(int statID) throws IOException
+	public static double[] getStatArrays(int statID) throws IOException,ThePHPPageGaveMeAnErrorException
 	{
 		//Connect to the byStat page and grab its text
 		Document doc = Jsoup.connect(byStatURL + statID).get();
@@ -165,7 +169,7 @@ public class JUNIT {
 			return dray;
 		}
 		//elseif(bodyText.has("error")
-		throw new IOException("Error calling getStatArrays(" + statID + ")\n"
+		throw new ThePHPPageGaveMeAnErrorException("Error calling getStatArrays(" + statID + ")\n"
 				+ "Printed Error: " + countries.getString("error"));
 	}
 	
