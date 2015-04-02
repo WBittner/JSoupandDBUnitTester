@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 
+
 //import JSoup bus'
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,7 +48,7 @@ public class JUNIT {
 		try
 		{
 			int param1 = 3;
-			JSONArray[] countryStats = getCountryArrays(5000);	
+			JSONArray[] countryStats = getCountryArrays("0");	
 			//printArray(countryStats);
 		}
 		catch(Exception e)
@@ -58,9 +59,7 @@ public class JUNIT {
 		//test the getStatsArray method
 		try
 		{
-			double[] statStats = getStatArrays(111);
-			for(double d : statStats)
-				System.out.print(d + ", ");
+			double[] statStats = getStatArrays(9 + "");
 		}
 		catch(Exception e)
 		{
@@ -114,7 +113,7 @@ public class JUNIT {
 		numCountries = countriesArray.length();		
 	}
 	
-	public static JSONArray[] getCountryArrays(int countryID) throws IOException, ThePHPPageGaveMeAnErrorException
+	public static JSONArray[] getCountryArrays(String countryID) throws IOException, ThePHPPageGaveMeAnErrorException
 	{
 		Document doc = Jsoup.connect(byCountryURL + countryID).get();
 		String bodyText = doc.body().text();
@@ -124,13 +123,16 @@ public class JUNIT {
 		
 		if(!stats.has("error"))
 		{
+
+			//System.out.println(stats);
 			//Step into the country keys value
-			JSONObject countryJSON = stats.getJSONObject(countryID + "");
+			//JSONObject countryJSON = stats.getJSONObject(countryID);
+			JSONArray countryJSONArray = stats.getJSONArray(countryID);
 			
 			//Create array, then assign each index a JSONArray for each stat
 			JSONArray[] jray = new JSONArray[numStats];
 			for(int i = 0; i < jray.length;i++)
-				jray[i] = countryJSON.getJSONArray(countryID + "");
+				jray[i] = (JSONArray) countryJSONArray.get(i);
 			
 			return jray;	
 		}
@@ -140,17 +142,21 @@ public class JUNIT {
 	
 	}
 	
-	public static double[] getStatArrays(int statID) throws IOException,ThePHPPageGaveMeAnErrorException
+	public static double[] getStatArrays(String statID) throws IOException,ThePHPPageGaveMeAnErrorException
 	{
 		//Connect to the byStat page and grab its text
 		Document doc = Jsoup.connect(byStatURL + statID).get();
 		String bodyText = doc.body().text();
+
 		JSONObject countries = new JSONObject(bodyText);
+		//JSONArray countries = new JSONArray(bodyText);
+		//countries.get(1)
+		
 		if(!countries.has("error"))
 		{			
 			//Split the text into an array of Strings
-			String[] sray = bodyText.split(",");
-			
+			String[] sray = countries.get(statID+"").toString().split(",");
+		
 			//Remove [ and ] from first and last strings
 			sray[0]=sray[0].substring(1);
 			sray[numCountries-1] = sray[numCountries-1].substring(0, sray[numCountries-1].length()-1);
@@ -158,6 +164,7 @@ public class JUNIT {
 			//get rid of quotes around numbers
 			for(int i = 0; i < numCountries; i++)
 				sray[i]=sray[i].substring(1,sray[i].length()-1);
+
 			
 			//convert string into double and put into double array
 			double[] dray = new double[numCountries];	
